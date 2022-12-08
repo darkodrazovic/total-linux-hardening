@@ -1,0 +1,42 @@
+# Default values
+Port {{ ssh_port }}
+AuthorizedKeysFile      .ssh/authorized_keys
+PasswordAuthentication yes
+ChallengeResponseAuthentication yes
+UsePAM yes
+Subsystem       sftp    /usr/lib/ssh/sftp-server
+AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+AcceptEnv LC_IDENTIFICATION LC_ALL
+
+# Harden values
+GSSAPIAuthentication no
+X11Forwarding no
+Protocol 2
+UsePrivilegeSeparation sandbox
+Compression no
+KerberosAuthentication no
+IgnoreUserKnownHosts yes
+PrintLastLog yes
+LogLevel VERBOSE
+X11Forwarding no
+MaxAuthTries 3
+IgnoreRhosts yes
+HostbasedAuthentication no
+PermitRootLogin no
+PermitEmptyPasswords no
+PermitUserEnvironment no
+MaxSessions 2
+AllowTcpForwarding no
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+ClientAliveInterval 300
+ClientAliveCountMax 0
+LoginGraceTime 60
+Banner /etc/issue.net
+AuthenticationMethods password keyboard-interactive publickey
+
+# Lynis recommendation
+StrictModes yes 
+AllowAgentForwarding no
+TCPKeepAlive no
+UseDNS no

@@ -1,0 +1,29 @@
+- name: ALL -> Report
+  debug:
+    msg: "Please run this playbook as a sudo user, and not as a root. Root login will be disabled by this hardening."
+  when: ansible_user == "root"
+  failed_when: true
+
+- name: ALL -> Report
+  debug:
+    msg: "{{ ansible_distribution }} {{ ansible_distribution_version }} is not supported"
+  when:
+     - not ( ansible_distribution == 'RedHat'   and ( ansible_distribution_major_version == '7'  ))
+     - not ( ansible_distribution == 'RedHat'   and ( ansible_distribution_major_version == '8'  ))
+     - not ( ansible_distribution == 'RedHat'   and ( ansible_distribution_major_version == '9'  ))
+     - not ( ansible_distribution == 'CentOS'   and ( ansible_distribution_major_version == '7'  ))
+     - not ( ansible_distribution == 'CentOS'   and ( ansible_distribution_major_version == '8'  ))
+     - not ( ansible_distribution == 'CentOS'   and ( ansible_distribution_major_version == '9'  ))
+     - not ( ansible_distribution == 'SLES_SAP' and ( ansible_distribution_major_version == '12' ))
+     - not ( ansible_distribution == 'SLES_SAP' and ( ansible_distribution_major_version == '15' ))
+     - not ( ansible_distribution == 'Suse'     and ( ansible_distribution_major_version == '12' ))
+     - not ( ansible_distribution == 'Suse'     and ( ansible_distribution_major_version == '15' ))
+  failed_when: true
+  ignore_errors: false
+  tags: SUPPORTED_OS
+
+- name: Run tasks common to all Linux systems
+  include: total-hardening-ALL.yml
+
+- name: Run OS-family related tasks
+  include: total-hardening-{{ ansible_os_family }}.yml

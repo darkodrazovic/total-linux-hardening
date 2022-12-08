@@ -1,0 +1,1 @@
+For update just delete rkhunter.tar.gz, download new version from the https://sourceforge.net/projects/rkhunter/files/rkhunter/, and rename it to rkhunter.tar.gz. 

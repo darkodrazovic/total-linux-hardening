@@ -1,0 +1,9 @@
+- hosts: all
+  become: yes
+  become_user: root
+  become_method: sudo
+  gather_facts: true
+  ignore_errors: no
+  
+  roles:
+    - total-linux-hardening

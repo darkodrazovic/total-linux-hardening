@@ -1,0 +1,23 @@
+galaxy_info:
+  author: Darko Drazovic
+  description: Ansible role for total Linux hardening on supported systems and for now thats are RHEL/CentOS 7,8,9 and SLES 12,15.
+
+  issue_tracker_url: https://github.com/kompjuteras/total-linux-hardening
+
+  license: GPL-3.0-or-later
+
+  min_ansible_version: 2.8
+
+  platforms:
+  - name: EL
+    versions:
+      - 9
+      - 8
+      - 7
+  - name: SLES
+    versions:
+      - 12
+      - 15
+
+  galaxy_tags:
+    - security
