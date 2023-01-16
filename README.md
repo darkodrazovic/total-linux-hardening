@@ -3,9 +3,10 @@ Total Linux Hardening
 
 Very restrictive ansible role for the Linux hardening enterprise systems by many standards, so please don't use it on already running machines. The role was planned to be used on newly created systems which will be in use after this hardening, not before.
 
-Currently, supported systems are:
+Role is tested and supported on:
 - CentOS 7, 8, 9
 - Red Hat 7, 8, 9
+- Oracle Linux 7, 8, 9
 - SLES_SAP (SLES) 12, 
 - SLES 15
 
