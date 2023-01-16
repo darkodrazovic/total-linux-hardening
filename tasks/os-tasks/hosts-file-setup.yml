@@ -1,0 +1,5 @@
+    - name: Add the IP name and FQDN to /etc/hosts for proper name resolving
+      lineinfile:
+        path: /etc/hosts
+        line: '{{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }} {{ ansible_fqdn }}'
+        state: present

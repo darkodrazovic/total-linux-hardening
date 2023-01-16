@@ -1,0 +1,10 @@
+
+    - name: No unauthorized UID 0 accounts
+      shell: |
+        awk -F: '($3 == "0") {print}' /etc/passwd | grep -vw ^root
+      register: uid0_check
+      changed_when: uid0_check.stdout|length > 0
+      failed_when: false
+      notify: No unauthorized UID 0 accounts
+
+    - meta: flush_handlers

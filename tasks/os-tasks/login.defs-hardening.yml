@@ -1,0 +1,14 @@
+    - name: Configure password hashing rounds in /etc/login.defs
+      lineinfile:
+        path: /etc/login.defs
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.new_value }}"
+      loop:
+        - { regexp: '^(PASS_MIN_DAYS|#PASS_MIN_DAYS)'               , new_value: 'PASS_MIN_DAYS 7' }
+        - { regexp: '^(PASS_MAX_DAYS|#PASS_MAX_DAYS)'               , new_value: 'PASS_MAX_DAYS 180' }
+        - { regexp: '^(PASS_WARN_AGE|#PASS_WARN_AGE)'               , new_value: 'PASS_WARN_AGE 7' }
+        - { regexp: '^(FAILLOG_ENAB|#FAILLOG_ENAB)'                 , new_value: 'FAILLOG_ENAB yes' }
+        - { regexp: '^(SHA_CRYPT_MIN_ROUNDS|#SHA_CRYPT_MIN_ROUNDS)' , new_value: 'SHA_CRYPT_MIN_ROUNDS 500000' }
+        - { regexp: '^(SHA_CRYPT_MAX_ROUNDS|#SHA_CRYPT_MAX_ROUNDS)' , new_value: 'SHA_CRYPT_MAX_ROUNDS 900000' }
+        - { regexp: '^(ENCRYPT_METHOD |#ENCRYPT_METHOD )'           , new_value: 'ENCRYPT_METHOD SHA512' }
+        - { regexp: '^(UMASK|#UMASK)'                               , new_value: 'UMASK 027' }

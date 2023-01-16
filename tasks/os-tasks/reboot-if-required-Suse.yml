@@ -1,0 +1,10 @@
+    - name: Check if a restart is required
+      shell: zypper ps -sss
+      args:
+        warn: false
+      register: reboot
+      changed_when: reboot.stdout|length > 0
+      failed_when: false
+      notify: Reboot server
+
+    - meta: flush_handlers

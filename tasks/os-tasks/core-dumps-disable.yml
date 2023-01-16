@@ -1,0 +1,10 @@
+    - name: Core dumps
+      pam_limits:
+        dest: /etc/security/limits.conf
+        domain: "*"
+        limit_type: "{{ item.limit_type }}"
+        limit_item: core
+        value: "0"
+      loop:
+        - { limit_type: 'soft' }
+        - { limit_type: 'hard' }

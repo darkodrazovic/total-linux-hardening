@@ -1,0 +1,29 @@
+    - name: Setup banners -> Set motd banners
+      copy:
+        src: files/motd
+        dest: /etc/motd
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Setup banners -> Set issue banners
+      copy:
+        dest: /etc/issue
+        content: |
+          Legal Notice: Unauthorized access and use of this system is strictly
+          prohibited and can result in civil and criminal penalties.
+          Authorized uses only. All activity may be monitored and reported.
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Setup banners -> Set issue.net banners
+      copy:
+        dest: /etc/issue.net
+        content: |
+          Legal Notice: Unauthorized access and use of this system is strictly
+          prohibited and can result in civil and criminal penalties.
+          Authorized uses only. All activity may be monitored and reported.
+        owner: root
+        group: root
+        mode: 0644

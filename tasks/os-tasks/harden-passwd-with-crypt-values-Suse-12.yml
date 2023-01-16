@@ -1,0 +1,8 @@
+    - name: Harden /etc/default/passwd with crypt values
+      lineinfile:
+        path: /etc/default/passwd
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.new_value }}"
+      loop:
+        - { regexp: '^(CRYPT=|#CRYPT=)', new_value: 'CRYPT=sha512' }
+        - { regexp: '^(CRYPT_FILES=|#CRYPT_FILES=)', new_value: 'CRYPT_FILES=sha512' }

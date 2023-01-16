@@ -1,0 +1,27 @@
+    - name: Set right permissions on critical files
+      file:
+        path: "{{ item.path }}"
+        mode: "{{ item.mode }}"
+        owner: root
+        group: root
+      with_items:
+        - { path: '/boot/grub2/grub.cfg' , mode: '0600' }
+        - { path: '/etc/cron.d' , mode: '0700' }
+        - { path: '/etc/cron.daily' , mode: '0700' }
+        - { path: '/etc/cron.deny' , mode: '0600' }
+        - { path: '/etc/cron.hourly' , mode: '0700' }
+        - { path: '/etc/cron.monthly' , mode: '0700' }
+        - { path: '/etc/cron.weekly' , mode: '0700' }
+        - { path: '/etc/crontab' , mode: '0600' }
+        - { path: '/etc/group' , mode: '0644' }
+        - { path: '/etc/group-' , mode: '0644' }
+        - { path: '/etc/hosts.allow' , mode: '0644' }
+        - { path: '/etc/hosts.deny' , mode: '0644' }
+        - { path: '/etc/issue' , mode: '0644' }
+        - { path: '/etc/issue.net' , mode: '0644' }
+        - { path: '/etc/motd' , mode: '0644' }
+        - { path: '/etc/passwd' , mode: '0644' }
+        - { path: '/etc/passwd-' , mode: '0644' }
+        - { path: '/etc/ssh/sshd_config' , mode: '0600' }
+        - { path: '/etc/at.deny' , mode: '0600' }
+      failed_when: false

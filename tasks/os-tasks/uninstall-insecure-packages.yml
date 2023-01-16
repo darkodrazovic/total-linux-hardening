@@ -1,0 +1,33 @@
+    - name: Remove insecure packages from the system
+      package:
+        name:
+          - prelink
+          - setroubleshoot
+          - setroubleshoot-server
+          - setroubleshoot-plugins
+          - avahi
+          - dhcp
+          - openldap-servers
+          - named
+          - smb
+          - nmb
+          - squid
+          - ypserv
+          - rsh
+          - ntalk
+          - telnet-server
+          - ypbind
+          - talk
+          - telnet
+          - openldap-clients
+          - mcstrans
+          - rsh-server
+          - libreswan
+          - gcc
+          - llvm
+          - clang
+          - open64
+          - pcc
+          - ntp
+          - xinetd
+        state: absent

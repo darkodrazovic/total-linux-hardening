@@ -1,0 +1,25 @@
+- name: Stop auditd manually
+  shell: service auditd stop
+  args:
+    warn: false
+
+- name: Set the configuration of the audit daemon
+  copy:
+    dest: /etc/audit/auditd.conf
+    src: files/AURULES/{{ ansible_os_family }}-auditd.conf
+    owner: root
+    group: root
+    mode: 0640
+    backup: yes
+
+- name: Set audit rules
+  copy:
+    dest: /etc/audit/rules.d/audit.rules
+    src: files/AURULES/{{ ansible_os_family }}-audit.rules
+    owner: root
+    group: root
+    mode: 0600
+- name: Restart auditd manually
+  shell: service auditd start
+  args:
+    warn: false

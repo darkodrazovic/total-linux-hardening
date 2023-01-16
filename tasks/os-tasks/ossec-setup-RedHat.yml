@@ -1,0 +1,8 @@
+    - name: Check if OSSEC already exists on the system
+      stat:
+        path: "/var/ossec/etc/ossec.conf"
+      register: ossec_result
+      changed_when: not ossec_result.stat.exists
+      notify: Install OSSEC
+
+    - meta: flush_handlers

@@ -1,0 +1,22 @@
+    - name: Disable dangerous filesystems and protocols
+      copy:
+        dest: "/etc/modprobe.d/stig-items.conf"
+        mode: '0644'
+        selevel: "s0"
+        setype: "modules_conf_t"
+        serole: "object_r"
+        seuser: "system_u"
+        content: |
+          install cramfs /bin/true
+          install freevxfs /bin/true
+          install jffs2 /bin/true
+          install hfs /bin/true
+          install hfsplus /bin/true
+          install squashfs /bin/true
+          install udf /bin/true
+          install vfat /bin/true
+          options ipv6 disable=1
+          install dccp /bin/true
+          install sctp /bin/true
+          install rds /bin/true
+          install tipc /bin/true

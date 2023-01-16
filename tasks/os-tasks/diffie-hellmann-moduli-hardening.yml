@@ -1,0 +1,20 @@
+    - name: Diffie Hellmann Moduli
+      shell: |
+        WEAK_MODULI="$(awk '$5  < 2047' /etc/ssh/moduli 2>/dev/null | wc -l)"
+        SAFE_MODULI="$(awk '$5 >= 2047' /etc/ssh/moduli 2>/dev/null | wc -l)"
+        # There must be at least 101 safe moduli -------------------------------
+        if [[ ${SAFE_MODULI} -gt 100 ]]; then
+          if [[ ${WEAK_MODULI} -gt 0 ]]; then
+            echo "There are ${WEAK_MODULI} weak moduli in /etc/ssh/moduli (${SAFE_MODULI} safe moduli will remains)"
+          fi
+        else
+          echo "Weak moduli removal is not safe in this server (only ${SAFE_MODULI} safe moduli will left)"
+        fi
+      register: dh_moduli_check
+      ignore_errors: true
+      changed_when: 
+        - dh_moduli_check.stdout|length > 0
+        - '"Weak moduli removal is not safe in this server" not in dh_moduli_check.stdout'
+      notify: Remove unsafe Diffie Hellmann Moduli
+
+    - meta: flush_handlers

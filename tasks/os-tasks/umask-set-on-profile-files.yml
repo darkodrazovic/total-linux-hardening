@@ -1,0 +1,11 @@
+    - name: Default umask could be more strict
+      replace:
+        path: "{{ item }}"
+        regexp: "umask(.*)[0][0-2][0-6]"
+        replace: "umask 027"
+      with_items:
+        - /etc/profile
+        - /etc/init.d/functions
+        - /etc/bashrc
+        - /etc/csh.cshrc
+      failed_when: false

@@ -1,0 +1,11 @@
+    - name: Disable SMB/NMB services
+      service:
+         name: "{{ item }}"
+         enabled: no
+         state: stopped
+      failed_when: false
+      with_items:
+        - smbd
+        - nmbd
+        - smb
+        - nmb

@@ -1,15 +1,2 @@
 ---
-# defaults file for total-linux-hardening
-    log_host: false                          # Linux: Whether this machine will host rsyslog messages for other machines
-    log_port: 514                            # Linux: Port to listen to RSYSLOG messages on (if log_host is true)
-    graphical_interface: false               # Whether to disable the GDM greeter service. The service will disabled on 'false'
-    ssh_port: 2222                           # SSH port to be configured on Linux systems. For default set Port to 22
-    disable_bash_history: true               # If you now want to disable bash history, please set this to false
-    session_timeout_seconds: 900             # Setup session timeout (default is 900). If you want to disable this, set this to 0 or less.
-    system_is_webserver: false               # If you plan to use httpd, set this to true
-    system_is_ftp: false                     # If you plan to use vsftp, set this to true
-    system_is_mailserver: false              # If you plan to use dovecot or own postfix setup, set this to true
-    install_aide: true                       # If you already use some other IDS set this to false 
-    reboot_is_approved: true                 # Set this to false if you don't want for servers to be rebooted at the end of hardening
-    selinux: "enforcing"                     # Options are enforcing, permissive, and disabled. Control is 'enforcing'
-    selinux_policy: "targeted"               # Options are targeted, minimum, or mls. Control has no default
+# defaults file for draza-hardening

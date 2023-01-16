@@ -1,0 +1,8 @@
+    - name: Use minimal number of administrative accounts
+      shell: grep '^wheel:' /etc/group | cut -d ':' -f 4 | tr , '\n' | grep .
+      register: wheel_check
+      changed_when: wheel_check.stdout_lines|length > 8
+      failed_when: false
+      notify: Minimal number of administrative accounts
+
+    - meta: flush_handlers

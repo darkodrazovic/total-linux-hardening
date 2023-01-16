@@ -1,0 +1,5 @@
+    - name: Setup INACTIVE=30 in /etc/default/useradd
+      lineinfile:
+        dest: /etc/default/useradd
+        regexp:  '^(INACTIVE|#INACTIVE)'
+        line: "INACTIVE=30"

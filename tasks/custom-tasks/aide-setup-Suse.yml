@@ -1,0 +1,69 @@
+- name: AIDE -> Install aide packages
+  package:
+    name: aide
+    state: present
+
+- name: AIDE -> Remove log file for AIDE (we will use stdout and redirection to file instead)
+  lineinfile:
+    dest: /etc/aide.conf
+    state: absent
+    regexp: "^report_url=file(.*)"
+
+- name: AIDE -> Setup path for AIDE database_out file
+  lineinfile:
+    dest: /etc/aide.conf
+    line: database_out=file:/var/lib/aide/aide.db.new.gz
+    regexp: "^database_out=.*"
+
+- name: AIDE -> Setup path for AIDE database file
+  lineinfile:
+    dest: /etc/aide.conf
+    line: database=file:/var/lib/aide/aide.db.gz
+    regexp: "^database=.*"
+
+- name: AIDE -> Logrotate rule for AIDE
+  copy:
+    dest: "/etc/logrotate.d/aide"
+    mode: "0644"
+    content: |
+      /var/log/aide/aide.log {
+        monthly
+        maxsize 300M
+        missingok
+        rotate 12
+        compress
+        dateext
+        notifempty
+        copytruncate
+      }
+
+- name: AIDE -> Create AIDE script which will be used for crontab
+  copy:
+    dest: "/usr/local/sbin/aide.sh"
+    mode: "0700"
+    owner: root
+    group: root
+    content: |
+      #!/bin/bash
+      mkdir -p /var/log/aide/
+      if [ ! -f /var/lib/aide/aide.db.gz ]; then
+        nice -n19 /usr/bin/aide --init
+        mv -f /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+      else
+        nice -n19 /usr/bin/aide --check 1>>/var/log/aide/aide.log
+        nice -n19 /usr/bin/aide --update
+        rm -f /var/lib/aide/aide.db.gz
+        mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+      fi
+
+- name: AIDE -> Create a cron entry for AIDE (daily check at 04:50)
+  cron:
+    name: AIDE checks (hardening)
+    minute: "50"
+    hour: "04"
+    user: root
+    job: "/usr/local/sbin/aide.sh &>/dev/null"
+    state: present
+
+- name: AIDE -> Run AIDE scan
+  shell: bash /usr/local/sbin/aide.sh &>/dev/null

@@ -1,0 +1,7 @@
+    - name: Set correct permissions for 'as' compiler
+      file:
+        path: /usr/bin/as
+        owner: root
+        group: root
+        mode: '0770'
+      failed_when: false

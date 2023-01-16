@@ -1,0 +1,10 @@
+    - name: Install sysstat
+      package:
+        name: sysstat
+        state: present
+
+    - name: Start and enable sysstat service
+      service:
+        name: sysstat
+        state: started
+        enabled: yes

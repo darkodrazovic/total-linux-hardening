@@ -1,0 +1,15 @@
+    - name: Set home directory permissions
+      shell: find /home -maxdepth 1 -mindepth 1 -perm /0077 -not -path "/home/local"
+      register: home_to_0700
+      changed_when: false
+
+    - name: Set CHMOD 700 on candidate folders
+      file:
+        path: "{{ item }}"
+        mode: '0700'
+      with_items: "{{ home_to_0700.stdout_lines }}"
+
+    - name: Set a+x for /home (always)
+      file:
+        path: /home
+        mode: 'a+x'

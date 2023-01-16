@@ -1,0 +1,42 @@
+    - name: Remove unnecessary packages
+      package:
+        name:
+          - wireshark
+          - ffmpeg
+          - spoonproxy
+          - jwebpane
+          - soulseek
+          - vandyke
+          - staroffice
+          - bersirc
+          - licq
+          - skype
+          - yahoo
+          - xchat
+          - wuala
+          - spotify
+          - bitlord
+          - torrent
+          - bitcomet
+          - napigator
+          - aimster
+          - amule
+          - ed2k
+          - blubster
+          - bearshare
+          - kazaa
+          - limewire
+          - gnucleus
+          - imesh
+          - hopster
+          - shareaza
+          - x2x
+          - x11vnc
+          - metavnc
+          - LogMeIn
+          - rdesktop
+          - ultravnc
+          - bitcoin
+          - sniff
+          - pdfcrack
+        state: absent

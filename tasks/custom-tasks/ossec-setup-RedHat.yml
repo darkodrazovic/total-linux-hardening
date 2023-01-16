@@ -1,0 +1,55 @@
+- name: OSSEC -> Create Atomic yum repo
+  copy:
+    dest: /etc/yum.repos.d/atomic.repo
+    mode: '0644'
+    owner: root
+    group: root
+    content: |
+      [atomic]
+      name = CentOS / Red Hat Enterprise Linux $releasever - atomic
+      mirrorlist = https://updates.atomicorp.com/channels/mirrorlist/atomic/centos-$releasever-$basearch
+      enabled = 0
+      protect = 0
+      gpgkey = https://www.atomicorp.com/RPM-GPG-KEY.atomicorp.txt
+      gpgcheck = 1
+
+- name: OSSEC -> Install OSSEC-HIDS
+  yum:
+    name: "ossec-hids-server"
+    state: present
+    enablerepo: "atomic"
+
+- name: OSSEC -> Move OSSEC from /var to /apps
+  shell: |
+    if [[ ! -d /apps/ossec ]]; then
+      echo "OSSEC is in /var"
+      mkdir -p /apps
+      mv /var/ossec /apps
+      ln -s /apps/ossec/ /var/ossec
+    fi
+  register: move_ossec
+  changed_when: move_ossec.stdout|length > 0
+
+- name: OSSEC -> Create logrotate rule for the OSSEC
+  copy:
+    dest: /etc/logrotate.d/ossec-hids
+    mode: '0644'
+    owner: root
+    group: root
+    content: |
+      /var/ossec/logs/*.log {
+        monthly
+        create 0664 ossec ossec
+        missingok
+        rotate 6
+        compress
+        copytruncate
+        notifempty
+        dateext
+      }
+
+- name: OSSEC -> Start and enable ossec-hids
+  service:
+    name: ossec-hids
+    state: started
+    enabled: yes

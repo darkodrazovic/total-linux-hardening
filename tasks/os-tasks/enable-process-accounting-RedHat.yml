@@ -1,0 +1,13 @@
+    - name: Enable process accounting - install psacct and usbguard
+      package:
+        name:
+          - psacct
+          - usbguard
+        state: present
+      failed_when: false
+
+    - name: Enable process accounting - service psacct to be running
+      service:
+        name: psacct
+        state: started
+        enabled: yes

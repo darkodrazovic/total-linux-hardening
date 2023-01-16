@@ -1,0 +1,4 @@
+    - name: Consider using a tool to automatically apply upgrades
+      yum:
+        name: dnf-automatic
+        state: present

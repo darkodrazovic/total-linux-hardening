@@ -1,0 +1,8 @@
+    - name: Check if AIDE already exists on the system
+      stat:
+        path: "/var/lib/aide/aide.db.gz"
+      register: aide_result
+      changed_when: not aide_result.stat.exists
+      notify: Install AIDE (RHEL)
+
+    - meta: flush_handlers

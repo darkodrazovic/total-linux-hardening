@@ -1,0 +1,11 @@
+- name: Enable process accounting - install acct
+  zypper:
+    name: acct
+    state: present
+  failed_when: false
+
+- name: Enable process accounting - service acct to be running
+  service:
+    name: acct
+    state: started
+    enabled: yes

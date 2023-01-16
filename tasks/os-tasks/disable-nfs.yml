@@ -1,0 +1,26 @@
+    - name: Disable NFS if it is not in use
+      shell: |
+        if [[ $(grep -vc "^[[:space:]]*#\|^[[:space:]]*$" /etc/exports 2>/dev/null) -eq 0 ]]; then
+          if service nfs status &>/dev/null; then
+            echo "NFS is running, but file /etc/exports is empty"
+          fi
+          if [[ $(systemctl is-enabled nfs 2>/dev/null | grep -c enabled) -gt 0 ]]; then
+            echo "NFS is enabled, but file /etc/exports is empty"
+          fi
+          if [[ $(chkconfig nfs --list 2>/dev/null | grep -c ':on') -gt 0 ]]; then
+            echo "NFS is enabled, but file /etc/exports is empty"
+          fi
+        else
+          echo "File /etc/exports is not empty so disabling NFS is strongly forbidden here"
+          echo "-------------------------- First 3 lines ---------------------------------"
+          grep -v "^[[:space:]]*#\|^[[:space:]]*$" /etc/exports | head -3
+        fi
+      register: nfs_file_check
+      changed_when: >
+        "File /etc/exports is not empty" not in nfs_file_check.stdout and
+        ( "NFS is running" in nfs_file_check.stdout or
+          "NFS is enabled" in nfs_file_check.stdout )
+      failed_when: false
+      notify: Disable NFS
+
+    - meta: flush_handlers

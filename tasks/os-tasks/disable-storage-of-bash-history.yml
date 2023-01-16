@@ -1,0 +1,21 @@
+    - name: Disable bash_storage in /etc/bashrc
+      blockinfile:
+        path: "/etc/bashrc"
+        marker: "# {mark} Disable storage of bash history ==========================="
+        state: present
+        create: no
+        block: |
+          export HISTFILESIZE=0
+          unset HISTFILE
+      failed_when: false
+
+    - name: Disable bash_storage in /etc/csh.cshrc
+      blockinfile:
+        path: "/etc/csh.cshrc"
+        marker: "# {mark} Disable storage of csh history  ==========================="
+        state: present
+        create: no
+        block: |
+         set history=20
+         set savehist=0
+      failed_when: false

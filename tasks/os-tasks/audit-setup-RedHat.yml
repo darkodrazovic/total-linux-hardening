@@ -1,0 +1,7 @@
+    - name: Check if audit rules are exists
+      shell: auditctl -l
+      register: audit_check
+      changed_when: '"No rules" in audit_check.stdout'
+      notify: Setup audit (RHEL)
+
+    - meta: flush_handlers

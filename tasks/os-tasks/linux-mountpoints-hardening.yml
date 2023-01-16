@@ -1,0 +1,34 @@
+    - name: Linux mount points
+      include_tasks: custom-tasks/partitions-hardening-loop.yml
+      loop:
+        - { partition: '/tmp' ,          flags: 'nodev,nosuid,noexec' }
+        - { partition: '/var' ,          flags: 'nodev,nosuid,noexec' }
+        - { partition: '/var/tmp' ,      flags: 'nodev,nosuid,noexec' }
+        - { partition: '/var/log' ,      flags: 'nodev,nosuid,noexec' }
+        - { partition: '/var/log/audit', flags: 'nodev,nosuid,noexec' }
+        - { partition: '/home' ,         flags: 'nodev,nosuid' }
+        - { partition: '/boot' ,         flags: 'nodev,nosuid,noexec' }
+
+    - name: Setup flags on /dev/shm partition
+      mount:
+        path: /dev/shm
+        src: tmpfs
+        fstype: tmpfs
+        opts: rw,nosuid,nodev,seclabel,noexec
+        dump: "0"
+        passno: "0"
+        state: present
+      notify: Remount /dev/shm
+
+    - name: Setup flags on /dev partition
+      mount:
+        path: /dev
+        src: devtmpfs
+        fstype: devtmpfs
+        opts: defaults,noexec,nosuid
+        dump: "0"
+        passno: "0"
+        state: present
+      notify: Remount /dev
+
+    - meta: flush_handlers

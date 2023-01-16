@@ -1,0 +1,7 @@
+    - name: Firewire ohci driver disabled
+      copy:
+        dest: "/etc/modprobe.d/firewire-blacklist.conf"
+        mode: '0644'
+        content: |
+           blacklist firewire-ohci
+           blacklist firewire-sbp2

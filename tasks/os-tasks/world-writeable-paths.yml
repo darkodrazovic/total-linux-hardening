@@ -1,0 +1,11 @@
+    - name: Check for world-writeable paths in path environment variables
+      shell: |
+        /usr/bin/df --local -P | \
+        /usr/bin/awk {' if (NR!=1) print $6'} | \
+        /usr/bin/xargs -I '{}' find '{}' -xdev -type f -perm -0002 | grep -v "^/tmp"
+      register: ww_files
+      failed_when: false
+      changed_when: ww_files.stdout|length > 0
+      notify: World-writeable paths
+
+    - meta: flush_handlers

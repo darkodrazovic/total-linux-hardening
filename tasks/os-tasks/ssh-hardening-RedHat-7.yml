@@ -1,0 +1,63 @@
+    - name: SSH hardening
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.new_value }}"
+        insertbefore: "^Subsystem"
+        validate: sshd -t -f %s
+      loop:
+        - { regexp: '^(AllowTcpForwarding|#AllowTcpForwarding)', new_value: 'AllowTcpForwarding no' }
+        - { regexp: '^(ClientAliveCountMax|#ClientAliveCountMax)', new_value: 'ClientAliveCountMax 2' }
+        - { regexp: '^(ClientAliveInterval|#ClientAliveInterval)', new_value: 'ClientAliveInterval 0' }
+        - { regexp: '^(Compression|#Compression)', new_value: 'Compression no' }
+        - { regexp: '^(FingerprintHash|#FingerprintHash)', new_value: 'FingerprintHash SHA256' }
+        - { regexp: '^(GatewayPorts|#GatewayPorts)', new_value: 'GatewayPorts no' }
+        - { regexp: '^(IgnoreRhosts|#IgnoreRhosts)', new_value: 'IgnoreRhosts yes' }
+        - { regexp: '^(LoginGraceTime|#LoginGraceTime)', new_value: 'LoginGraceTime 120' }
+        - { regexp: '^(LogLevel|#LogLevel)', new_value: 'LogLevel VERBOSE' }
+        - { regexp: '^(MaxAuthTries|#MaxAuthTries)', new_value: 'MaxAuthTries 3' }
+        - { regexp: '^(MaxSessions|#MaxSessions)', new_value: 'MaxSessions 2' }
+        - { regexp: '^(PermitRootLogin|#PermitRootLogin)', new_value: 'PermitRootLogin no' }
+        - { regexp: '^(PermitUserEnvironment|#PermitUserEnvironment)', new_value: 'PermitUserEnvironment no' }
+        - { regexp: '^(PermitTunnel|#PermitTunnel)', new_value: 'PermitTunnel no' }
+        - { regexp: '^(PrintLastLog|#PrintLastLog)', new_value: 'PrintLastLog yes' }
+        - { regexp: '^(StrictModes|#StrictModes)', new_value: 'StrictModes yes' }
+        - { regexp: '^(TCPKeepAlive|#TCPKeepAlive)', new_value: 'TCPKeepAlive no' }
+        - { regexp: '^(UseDNS|#UseDNS)', new_value: 'UseDNS no' }
+        - { regexp: '^(X11Forwarding|#X11Forwarding)', new_value: 'X11Forwarding no' }
+        - { regexp: '^(AllowAgentForwarding|#AllowAgentForwarding)', new_value: 'AllowAgentForwarding no' }
+        - { regexp: '^(UsePrivilegeSeparation|#UsePrivilegeSeparation)', new_value: 'UsePrivilegeSeparation sandbox' }
+        - { regexp: '^(ciphers|#ciphers)', new_value: 'ciphers chacha20-poly1305@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com' }
+      notify: Reload sshd
+
+    - name: Change SSH PORT
+      block:
+        - name: Ensure that policycoreutils-python is installed
+          yum:
+            name: "policycoreutils-python"
+            state: present
+        - name: Allow for Selinux to allow sshd to listen on tcp port {{ ssh_port_to_set }}
+          seport:
+            ports: '{{ ssh_port_to_set }}'
+            proto: tcp
+            setype: ssh_port_t
+            state: present
+        - name: Allow port {{ ssh_port_to_set }} for firewalld
+          firewalld:
+            port: '{{ ssh_port_to_set }}/tcp'
+            permanent: yes
+            immediate: yes
+            state: enabled
+          failed_when: false
+        - name: Port - Set value in /etc/ssh/sshd_config
+          lineinfile:
+            path: /etc/ssh/sshd_config
+            regexp: '^(Port|#Port)'
+            line: 'Port {{ ssh_port_to_set }}'
+            insertbefore: "^Subsystem"
+            validate: sshd -t -f %s
+          notify: Reload sshd
+        - meta: flush_handlers
+        - name: Setup ansible_port to {{ ssh_port_to_set }}
+          set_fact:
+            ansible_ssh_port: "{{ ssh_port_to_set }}"

@@ -1,1 +1,0 @@
-For update just delete lynis.tar.gz, download new version from the https://cisofy.com/downloads/lynis/, and rename it to lynis.tar.gz.

@@ -1,0 +1,13 @@
+    - name: Ensure that yum-utils is installed
+      yum:
+        name: yum-utils
+        state: present
+
+    - name: Check if a system reboot is required
+      shell: needs-restarting -r 2>/dev/null | grep 'Reboot is required'
+      register: reboot
+      changed_when: reboot.stdout|length > 0
+      failed_when: false
+      notify: Reboot server
+
+    - meta: flush_handlers

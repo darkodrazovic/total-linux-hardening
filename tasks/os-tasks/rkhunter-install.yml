@@ -1,0 +1,8 @@
+    - name: Check if rkhunter is installed
+      stat:
+        path: "/usr/local/bin/rkhunter"
+      register: result
+      changed_when: not result.stat.exists
+      notify: Install rkhunter
+
+    - meta: flush_handlers

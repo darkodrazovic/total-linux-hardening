@@ -1,0 +1,5 @@
+    - name: DNSSEC support (systemd-resolved)
+      service:
+        name: systemd-resolved
+        state: started
+        enabled: yes

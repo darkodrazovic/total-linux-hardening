@@ -1,0 +1,158 @@
+    - name: Reboot server
+      reboot:
+
+    - name: Reload sshd
+      service:
+        name: sshd
+        state: reloaded
+
+    - name: Setup audit (RHEL)
+      include_tasks: custom-tasks/audit-setup-RedHat.yml
+
+    - name: Install rkhunter
+      include_tasks: custom-tasks/rkhunter-install.yml
+
+    - name: Remount /proc if hidepid=2 is configured
+      mount:
+        path: /proc
+        opts: defaults,hidepid=2,gid=nohidproc
+        state: remounted
+
+    - name: Restart polkit service
+      service:
+        name: 'polkit'
+        state: restarted
+
+    - name: Remount /dev/shm
+      mount:
+        path: /dev/shm
+        state: remounted
+
+    - name: Remount /dev
+      mount:
+        path: /dev
+        state: remounted
+
+    - name: Install AIDE (RHEL)
+      include_tasks: custom-tasks/aide-setup-RedHat.yml
+
+    - name: Install OSSEC
+      include_tasks: custom-tasks/ossec-setup-RedHat.yml
+
+    - name: Change password (message)
+      debug:
+        msg:
+          - "Please update password for the current users, they still have old hashing value"
+      failed_when: true
+      ignore_errors: true
+
+    - name: Minimal number of administrative accounts
+      debug:
+        msg:
+          - "Maximum 8 users in wheel group is allowed, please review and remove unnecessary accounts"
+          - "Accounts: {{ wheel_check.stdout | replace('\n', ', ') }}"
+      failed_when: true
+      ignore_errors: true
+
+    - name: Set Defaults env_reset
+      lineinfile:
+        path: /etc/sudoers
+        line: 'Defaults env_reset'
+        insertbefore: '^Defaults(.*)env_keep'
+        firstmatch: true
+        validate: visudo -cf %s
+
+    - name: No unauthorized UID 0 accounts
+      debug:
+        msg:
+          - Someone other than root have UID-0 on this system, please check!
+          - "{{ uid0_check.stdout_lines }}"
+      failed_when: true
+      ignore_errors: true
+
+    - name: Accounts without password
+      debug:
+        msg:
+          - Please set password for these accounts...
+          - "{{ account_without_pass.stdout_lines }}"
+      when: account_without_pass.stdout|length > 0
+      failed_when: true
+      ignore_errors: true
+
+    - name: Remove unsafe Diffie Hellmann Moduli
+      shell: |
+        set -e -o pipefail
+        cp -p /etc/ssh/moduli /etc/ssh/moduli-backup-$(date +%F-%H%M%S)
+        awk '$5 >= 2047' /etc/ssh/moduli > /root/.diffie_hellmann_moduli-safe
+        cat /root/.diffie_hellmann_moduli-safe > /etc/ssh/moduli
+        rm -f /root/.diffie_hellmann_moduli-safe
+      failed_when: false
+
+    - name: Disable NFS
+      service:
+        name: nfs
+        state: stopped
+        enabled: no
+
+    - name: Lock service accounts
+      user:
+        name: "{{ item }}"
+        password_lock: yes
+      loop: "{{ service_acc_check.stdout_lines }}"
+
+    - name: World-writeable paths
+      debug:
+        msg:
+          - World writable files found (fix that manually)
+          - "{{ ww_files.stdout_lines }}"
+      when: ww_files.stdout|length > 0
+      failed_when: true
+      ignore_errors: true
+
+    - name: Ensure that all passwords are shadowed
+      debug:
+        msg:
+          - Password for these accounts is not shadowed, please fix manually...
+          - "{{ shadowed_check.stdout_lines }}"
+      when: shadowed_check.stdout|length > 0
+      failed_when: true
+      ignore_errors: true
+
+    - name: Set CHMOD 0640 on log files
+      file:
+        path: "{{ item }}"
+        mode: '0640'
+        state: file
+      with_items: "{{ candidates_0640.stdout_lines }}"
+
+    - name: Set CHMOD 0660 on log files
+      file:
+        path: "{{ item }}"
+        mode: '0660'
+        state: file
+      with_items: "{{ candidates_0660.stdout_lines }}"
+
+    - name: Set CHMOD 0733 on log files
+      file:
+        path: "{{ item }}"
+        mode: '0733'
+        state: file
+      with_items: "{{ candidates_0733.stdout_lines }}"
+
+    - name: Set CHMOD 0664 on log files
+      file:
+        path: "{{ item }}"
+        mode: '0664'
+        state: file
+      with_items: "{{ candidates_0664.stdout_lines }}"
+
+    - name: Install AIDE (SLES)
+      include_tasks: custom-tasks/aide-setup-Suse.yml
+
+    - name: Setup audit (SLES)
+      include_tasks: custom-tasks/audit-setup-Suse.yml
+
+    - name: Restart SuSEfirewall2
+      service:
+        name: SuSEfirewall2_setup
+        state: restarted

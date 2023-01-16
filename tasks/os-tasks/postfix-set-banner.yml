@@ -1,0 +1,6 @@
+    - name: Postfix banner
+      lineinfile:
+        path: /etc/postfix/main.cf
+        regexp:  '^(smtpd_banner|#smtpd_banner)'
+        line: "smtpd_banner = $myhostname ESMTP"
+      failed_when: false

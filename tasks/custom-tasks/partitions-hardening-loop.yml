@@ -1,0 +1,103 @@
+- name: Check and setup partition --> {{ item.partition }}
+  block:
+    - name: Setup partition flag
+      set_fact:
+        partition_name: "{{ item.partition }}"
+    - name: Check if {{ partition_name }} is currently supported by this hardening
+      shell: mount | grep " {{ partition_name }} " | grep "ext3\|ext4\|xfs"
+      args:
+       warn: false
+      register: mount_check_fs
+      changed_when: false
+      failed_when: false
+    - name: Check if {{ partition_name }} is separate partition
+      shell: mount | grep " {{ partition_name }} "
+      args:
+       warn: false
+      register: mount_check_separate
+      changed_when: false
+      failed_when: false
+    - name: Get {{ partition_name }} mount device
+      shell: awk '($2 == "{{ partition_name }}" ) { print $1 }' /etc/fstab
+      register: mount_check_device
+      changed_when: false
+      failed_when: false
+    - name: Get {{ partition_name }} filesystem from fstab
+      shell: awk '($2 == "{{ partition_name }}" ) { print $3 }' /etc/fstab
+      register: mount_check_fs_fstab
+      changed_when: false
+      failed_when: false
+    - name: Get {{ partition_name }} mount options
+      shell: awk '($2 == "{{ partition_name }}" ) { print $4 }' /etc/fstab
+      register: mount_check_options
+      changed_when: false
+      failed_when: false
+    - name: Get {{ partition_name }} dump option
+      shell: awk '($2 == "{{ partition_name }}" ) { print $5 }' /etc/fstab
+      register: mount_check_dump
+      changed_when: false
+      failed_when: false
+    - name: Get {{ partition_name }} passno option
+      shell: awk '($2 == "{{ partition_name }}" ) { print $6 }' /etc/fstab
+      register: mount_check_passno
+      changed_when: false
+      failed_when: false
+    - name: Report to user when {{ partition_name }} is not separate or fs is not yet supported
+      debug:
+        msg:
+          - "Partition is not separate or filesystem is not yet supported"
+          - "Please FIX THIS MANUALLY for {{ partition_name }}"
+          - "mount_check_fs - {{ mount_check_fs.stdout }}"
+          - "mount_check_separate - {{ mount_check_separate.stdout }}"
+          - "mount_check_device - {{ mount_check_device.stdout }}"
+          - "mount_check_fs_fstab - {{ mount_check_fs_fstab.stdout }}"
+          - "mount_check_options - {{ mount_check_options.stdout }}"
+          - "mount_check_dump - {{ mount_check_dump.stdout }}"
+          - "mount_check_passno - {{ mount_check_passno.stdout }}"
+      when: >
+        mount_check_fs.stdout | length == 0 or
+        mount_check_separate.stdout | length == 0 or
+        mount_check_fs_fstab.stdout | length == 0
+      failed_when: true
+      ignore_errors: true
+    - name: Setup {{ partition_name }} partition
+      block:
+        - name: Set clean partition fact
+          set_fact:
+            mount_flags: "{{ mount_check_options.stdout }}"
+        - name: Set flag if {{ partition_name }} does not have option --> nodev
+          set_fact:
+            mount_flags: "{{ mount_flags }},nodev"
+          when:
+            - '"nodev" not in mount_flags'
+            - '"nodev" in item.flags'
+        - name: Set flag if {{ partition_name }} does not have option --> nosuid
+          set_fact:
+            mount_flags: "{{ mount_flags }},nosuid"
+          when:
+            - '"nosuid" not in mount_flags'
+            - '"nosuid" in item.flags'
+          changed_when: false
+        - name: Set flag if {{ partition_name }} does not have option --> noexec
+          set_fact:
+            mount_flags: "{{ mount_flags }},noexec"
+          when:
+            - '"noexec" not in mount_flags'
+            - '"noexec" in item.flags'
+          changed_when: false
+        - name: Add to {{ partition_name }} missing mount option(s) and remount
+          mount:
+            name: '{{ partition_name }}'
+            src: '{{ mount_check_device.stdout }}'
+            state: mounted
+            fstype: '{{ mount_check_fs_fstab.stdout }}'
+            opts: "{{ mount_flags }}"
+            dump: '{{ mount_check_dump.stdout }}'
+            passno: '{{ mount_check_passno.stdout }}'
+            backup: yes
+      when:
+        - mount_check_separate.stdout | length > 0
+        - mount_check_fs.stdout | length > 0
+        - mount_check_fs_fstab.stdout | length > 0
+  tags:
+    - lynis-FILE-6374

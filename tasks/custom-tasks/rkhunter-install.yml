@@ -1,0 +1,23 @@
+- name: RKhunter -> Download and extract
+  unarchive:
+    src: https://altushost-swe.dl.sourceforge.net/project/rkhunter/rkhunter/1.4.6/rkhunter-1.4.6.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: RKhunter -> Install
+  shell: |
+    cd /tmp/rkhunter-1.4.6
+    bash installer.sh --install
+
+- name: RKhunter -> Remove related trash
+  file:
+    path: "/tmp/rkhunter-1.4.6"
+    state: absent
+
+- name: RKhunter -> Create related symlink
+  file:
+    src: /usr/local/bin/rkhunter
+    dest: /bin/rkhunter
+    owner: root
+    group: root
+    state: link

@@ -1,0 +1,34 @@
+    - name: Ensure that polkit is installed
+      package:
+        name: polkit
+        state: present
+
+    - name: Set hidepid=2 in /etc/fstab so users cannot see pids of other users
+      mount:
+        path: /proc
+        src: proc
+        fstype: proc
+        opts: defaults,hidepid=2,gid=nohidproc
+        passno: "0"
+        dump: "0"
+        state: present
+
+    - name: Ensure group "nohidproc" exists - needed for hidepid
+      group:
+        name: nohidproc
+        state: present
+        gid: 23
+      notify:
+        - Remount /proc if hidepid=2 is configured
+        - Restart polkit service
+
+    - name: Add the group nohidproc as a secondary to polkitd
+      user:
+        name: polkitd
+        groups: nohidproc
+        append: yes
+      notify:
+        - Remount /proc if hidepid=2 is configured
+        - Restart polkit service
+
+    - meta: flush_handlers

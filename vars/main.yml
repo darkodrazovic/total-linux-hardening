@@ -1,2 +1,2 @@
 ---
-# vars file for total-linux-hardening
+    ssh_port_to_set: 2222

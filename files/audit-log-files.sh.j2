@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# ----------------------------------------------------------------------------------------------------------
+# Script created by: Darko Drazovic / darkodrazovic.github.io
+# -----------------------------------------------------------------------------------------------------------
+
+SCRIPT_LOG="/var/log/log-permissions-backup.log"
+touch "${SCRIPT_LOG}"
+chmod 600 "${SCRIPT_LOG}"
+TMP_FILE="/tmp/permissions_to_fix.txt"
+
+function set_permission {
+  PERM=$1
+  if [[ $(grep -c . "${TMP_FILE}" 2>/dev/null) -gt 0 ]]; then
+    IFS=''
+    while read -r logs; do
+      stat -c "chmod -v %a '%n' #$(date +'%Y-%m-%d_%H:%M:%S')_mode_changed_to_${PERM}" "${logs}" >> "${SCRIPT_LOG}"
+      chmod -v "${PERM}" "$logs"
+    done < "${TMP_FILE}"
+  fi
+  rm -f "${TMP_FILE}"
+}
+
+#####################################################################################
+# Candidates for the CHMOD 640 ======================================================
+{
+  nice -n 19 find /var/log        -type f -perm /0137 -name "boot.log" 2>/dev/null; \
+  nice -n 19 find /var/log        -type f -perm /0137 -name "messages" 2>/dev/null; \
+  nice -n 19 find /var/log        -type f -perm /0137 -name "syslog*"  2>/dev/null; \
+  nice -n 19 find /var/log/syslog -type f -perm /0137                  2>/dev/null; \
+  nice -n 19 find /var/log        -type f -perm /0137 -name "auth.log" 2>/dev/null; \
+  nice -n 19 find /var/log        -type f -perm /0137 -name "secure"   2>/dev/null; \
+  nice -n 19 find /var/log        -type f -perm /0137 -name "dmesg"    2>/dev/null; \
+  nice -n 19 find /var/log        -type f -perm /0137 -name "kern.log" 2>/dev/null; \
+  nice -n 19 find /var/log        -type f -perm /0137 -name "faillog"  2>/dev/null; \
+  nice -n 19 find /var/log        -type f -perm /0137 -name "cron"     2>/dev/null; \
+  nice -n 19 find /var/log        -type f -perm /0137 -name "yum.log"  2>/dev/null; \
+  nice -n 19 find /var/log        -type f -perm /0137 -name "mail*"    2>/dev/null; \
+  nice -n 19 find /var/log/httpd  -type f -perm /0137                  2>/dev/null; \
+  nice -n 19 find /var/log        -type f -perm /0137 -name "mysql*"   2>/dev/null; \
+  nice -n 19 find /var/log        -type f -perm /0137 -name "apache*"  2>/dev/null 
+} > "${TMP_FILE}"
+set_permission 640
+
+
+#####################################################################################
+# Candidates for the CHMOD 660 ======================================================
+{
+  nice -n 19 find /var/log -type f -perm /0117 -name "pacemaker.log"   2>/dev/null; \
+  nice -n 19 find /var/log -type f -perm /0117 -name "pacemaker.log-*" 2>/dev/null; \
+  nice -n 19 find /var/log -type f -perm /0117 -name "nsclient.log*"   2>/dev/null
+} > "${TMP_FILE}"
+set_permission 660
+
+
+##########################################################################
+# Candidates for the CHMOD 733 ===========================================
+{
+  nice -n 19 find /var/log -type d -perm /0044 -name "sudosh" 2>/dev/null
+} > "${TMP_FILE}"
+set_permission 733
+
+
+#######################################################################
+# Candidates for the CHMOD 664 ========================================
+{
+  nice -n 19 find /var/log -type f -perm /0113 -name "wtmp" 2>/dev/null
+} > "${TMP_FILE}"
+set_permission 664
+
+
+exit 0

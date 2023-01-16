@@ -1,0 +1,16 @@
+    - name: Set session timeout
+      copy:
+        dest: /etc/profile.d/session-timeout.sh
+        mode: '0644'
+        owner: root
+        group: root
+        content: |
+          # Set session timeout
+          TMOUT=900
+          export TMOUT
+
+    - name: Set CSH session timeout
+      lineinfile:
+        dest: /etc/csh.cshrc
+        regexp:  '^(set -r autologout|#set -r autologout)'
+        line: "set -r autologout=15"

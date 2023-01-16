@@ -1,0 +1,6 @@
+    - name: Enforce strict permissions for root home directory
+      file:
+        path: /root
+        state: directory
+        recurse: no
+        mode: '0700'

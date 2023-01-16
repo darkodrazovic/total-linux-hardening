@@ -1,0 +1,8 @@
+- include_tasks: os-tasks/reboot-if-required-Suse.yml
+- include_tasks: os-tasks/kernel-hardening-Suse.yml
+- include_tasks: os-tasks/ssh-hardening-Suse-15.yml
+- include_tasks: os-tasks/disable-insecure-filesystems-sockets-protocols-Suse.yml
+- include_tasks: os-tasks/enable-process-accounting-Suse.yml
+- include_tasks: os-tasks/audit-setup-Suse.yml
+- include_tasks: os-tasks/aide-setup-Suse.yml
+- include_tasks: os-tasks/configure-password-hashing-rounds-Suse.yml

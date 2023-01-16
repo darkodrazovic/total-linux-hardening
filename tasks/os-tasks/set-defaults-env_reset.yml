@@ -1,0 +1,9 @@
+
+    - name: Defaults env_reset
+      shell: grep -E "^Defaults(.*)env_reset" /etc/sudoers
+      register: env_reset_check
+      changed_when: env_reset_check.stdout|length == 0
+      failed_when: false
+      notify: Set Defaults env_reset
+
+    - meta: flush_handlers

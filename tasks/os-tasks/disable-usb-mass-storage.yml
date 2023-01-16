@@ -1,0 +1,6 @@
+    - name: USB mass storage must be disabled
+      copy:
+        dest: "/etc/modprobe.d/usb-blacklist.conf"
+        mode: '0644'
+        content: |
+           blacklist usb-storage

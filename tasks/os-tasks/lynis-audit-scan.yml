@@ -1,0 +1,36 @@
+- name: Lynis -> Extract installation files
+  unarchive:
+    src: files/LYNIS/lynis-3.0.8.tar.gz
+    dest: /usr/local/
+
+- name: Lynis -> Run Lynis audit scan
+  shell: |
+    cd /usr/local/lynis
+    ./lynis audit system &>/tmp/lynis.out
+  ignore_errors: true
+  changed_when: false
+
+- name: Check Lynis audit score
+  shell: grep 'Hardening index' /var/log/lynis.log | cut -d " " -f 3- | grep -o '[[:digit:]]*'
+  register: audit_score
+
+- name: Lynis -> Fetch Lynis scanning results
+  fetch:
+    src: /tmp/lynis.out
+    dest: /tmp/lynis-scan-{{ inventory_hostname }}.out
+    flat: yes
+  changed_when: false
+
+- name: Lynis -> Check locally scan results
+  debug:
+     msg:
+       - Run this command on the Ansible server
+       - "cat /tmp/lynis-scan-{{ inventory_hostname }}.out"
+  changed_when: false
+  failed_when: audit_score.stdout|int < 85
+  ignore_errors: true
+
+- name: Show audit score and info (less than 85/100 is compliance fail)
+  debug: msg='Hardening index --> {{ audit_score.stdout }}/100'
+  failed_when: audit_score.stdout|int < 85
+  ignore_errors: true
