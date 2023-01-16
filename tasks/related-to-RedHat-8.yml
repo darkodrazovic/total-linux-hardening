@@ -1,0 +1,11 @@
+- include_tasks: os-tasks/reboot-if-required-RedHat.yml
+- include_tasks: os-tasks/kernel-hardening-RedHat-8.yml
+- include_tasks: os-tasks/ssh-hardening-RedHat-8.yml
+- include_tasks: os-tasks/disable-insecure-filesystems-sockets-protocols-RedHat.yml
+- include_tasks: os-tasks/enable-process-accounting-RedHat.yml
+- include_tasks: os-tasks/dnf-automatic-install-RedHat.yml
+- include_tasks: os-tasks/audit-setup-RedHat.yml
+- include_tasks: os-tasks/aide-setup-RedHat.yml
+- include_tasks: os-tasks/ossec-setup-RedHat.yml
+- include_tasks: os-tasks/configure-password-hashing-rounds-RedHat.yml
+- include_tasks: os-tasks/enable-DNSSEC-support-RedHat.yml

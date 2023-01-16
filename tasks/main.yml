@@ -34,7 +34,7 @@
 - import_tasks: os-tasks/set-compiler-permissions.yml
 
 # Run OS-family related tasks
-- include_tasks: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+- include_tasks: "related-to-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
 
 # Run Lynis audit scan
 - import_tasks: os-tasks/lynis-audit-scan.yml
